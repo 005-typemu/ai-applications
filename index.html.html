@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>การประยุกต์ใช้ AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1b2e;
+    --bg-soft:#152840;
+    --ink:#eef3f8;
+    --ink-dim:#a9bdd3;
+    --accent:#36c9b0;
+    --accent-dim:#1f7a6b;
+    --line:#24395a;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f3f6f9;
+      --bg-soft:#ffffff;
+      --ink:#101826;
+      --ink-dim:#4a5b70;
+      --accent:#0f8f78;
+      --accent-dim:#c7ebe3;
+      --line:#dbe4ec;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans Thai","Prompt",sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    min-height:100%;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0 0 auto;
+    height:env(safe-area-inset-top,0px);
+    background:var(--bg-soft);
+    z-index:10;
+  }
+  header{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:5;
+    background:var(--bg-soft);
+    border-bottom:1px solid var(--line);
+    padding:18px 20px;
+  }
+  .brand{
+    font-family:"Prompt",sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:0.01em;
+    margin:0 0 12px 0;
+  }
+  .brand span{color:var(--accent);}
+  nav{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  nav button{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    background:transparent;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:9px 18px;
+    cursor:pointer;
+    transition:background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  nav button:hover{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#06211c;
+  }
+  nav button.active{
+    background:var(--accent-dim);
+    border-color:var(--accent);
+    color:var(--ink);
+  }
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:40px 20px 80px;
+  }
+  .page{display:none;}
+  .page.active{display:block;}
+  h1{
+    font-family:"Prompt",sans-serif;
+    font-size:clamp(28px,5vw,40px);
+    line-height:1.25;
+    margin:0 0 14px 0;
+  }
+  .lede{
+    color:var(--ink-dim);
+    font-size:17px;
+    line-height:1.7;
+    max-width:62ch;
+    margin:0 0 32px 0;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:16px;
+    background:var(--bg-soft);
+  }
+  .card h3{
+    margin:0 0 8px 0;
+    font-size:18px;
+    font-family:"Prompt",sans-serif;
+  }
+  .card p{
+    margin:0;
+    color:var(--ink-dim);
+    line-height:1.7;
+    font-size:15.5px;
+  }
+  .cta-row{
+    margin-top:28px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    border-radius:8px;
+    padding:12px 22px;
+    cursor:pointer;
+    border:1.5px solid var(--accent);
+    background:var(--accent);
+    color:#06211c;
+    transition:background-color .18s ease, color .18s ease;
+  }
+  .btn:hover{
+    background:transparent;
+    color:var(--accent);
+  }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border-color:var(--line);
+  }
+  .btn.ghost:hover{
+    background:var(--ink);
+    color:var(--bg);
+    border-color:var(--ink);
+  }
+  form{display:flex;flex-direction:column;gap:14px;max-width:420px;}
+  label{font-size:14px;color:var(--ink-dim);}
+  input,textarea{
+    font-family:inherit;
+    font-size:15px;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:var(--bg);
+    color:var(--ink);
+  }
+  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+  /* รูปภาพหน้าแรก: จำกัดความสูง ไม่ให้ใหญ่เกินไปทั้งบนมือถือและคอม */
+  .hero-img{
+    width:100%;
+    max-width:480px;
+    height:auto;
+    max-height:280px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid var(--line);
+    display:block;
+    margin:0 auto 32px auto;
+    cursor:pointer;
+    transition:border-color .25s ease, filter .25s ease, transform .25s ease;
+    filter:saturate(1) brightness(1);
+  }
+  .hero-img:hover{
+    border-color:var(--accent);
+    filter:saturate(1.6) brightness(1.08) hue-rotate(-6deg);
+    transform:scale(1.015);
+  }
+
+  /* รูปภาพในการ์ด: ขนาดเล็กกว่า เท่ากันทุกใบ */
+  .card-img{
+    width:100%;
+    max-width:260px;
+    height:160px;
+    object-fit:cover;
+    border-radius:8px;
+    display:block;
+    margin:0 auto 14px auto;
+    cursor:pointer;
+    border:2px solid transparent;
+    transition:border-color .25s ease, filter .25s ease;
+    filter:saturate(1) brightness(1);
+  }
+  .card-img:hover{
+    border-color:var(--accent);
+    filter:saturate(1.6) brightness(1.08) hue-rotate(-6deg);
+  }
+
+  @media (max-width:480px){
+    .hero-img{
+      max-width:100%;
+      max-height:200px;
+    }
+    .card-img{
+      max-width:100%;
+      height:140px;
+    }
+  }
+
+  footer{
+    text-align:center;
+    color:var(--ink-dim);
+    font-size:13px;
+    padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="brand">AI<span>Applications</span></p>
+  <nav>
+    <button data-page="home" class="active">หน้าแรก</button>
+    <button data-page="uses">การประยุกต์ใช้</button>
+    <button data-page="contact">ติดต่อเรา</button>
+  </nav>
+</header>
+
+<main>
+
+  <section id="home" class="page active">
+    <h1>ปัญญาประดิษฐ์ทำงานร่วมกับคนได้จริง</h1>
+    <p class="lede">เว็บไซต์นี้รวบรวมตัวอย่างการนำ AI ไปใช้งานจริงในชีวิตประจำวันและในองค์กร ตั้งแต่งานเอกสารไปจนถึงการวิเคราะห์ข้อมูล เพื่อให้เห็นภาพว่า AI ช่วยให้งานง่ายขึ้นได้อย่างไร</p>
+    <img class="hero-img" src="images/หน้าแรก.png" alt="การประยุกต์ใช้ AI 3 ด้านสำคัญ">
+    <div class="card">
+      <h3>เข้าใจง่าย ใช้ได้จริง</h3>
+      <p>เนื้อหาเขียนด้วยภาษาธรรมดา ไม่เน้นศัพท์เทคนิค เหมาะสำหรับผู้เริ่มต้นที่อยากรู้ว่า AI เข้ามาเปลี่ยนแปลงงานแต่ละประเภทอย่างไร</p>
+    </div>
+    <div class="cta-row">
+      <button class="btn" onclick="goTo('uses')">ดูตัวอย่างการใช้งาน</button>
+      <button class="btn ghost" onclick="goTo('contact')">ติดต่อเรา</button>
+    </div>
+  </section>
+
+  <section id="uses" class="page">
+    <h1>การประยุกต์ใช้ AI</h1>
+    <p class="lede">ตัวอย่างบางส่วนของการนำ AI ไปใช้ในด้านต่าง ๆ</p>
+    <div class="card">
+      <h3>ด้านการศึกษา</h3>
+      <img class="card-img" src="images/การศึกษา.png" alt="AI ด้านการศึกษา">
+      <p>AI ช่วยสรุปเนื้อหาบทเรียนที่ยาวและซับซ้อนให้เข้าใจง่ายขึ้น ตอบคำถามของผู้เรียนได้ตลอดเวลาแม้นอกเวลาเรียน และยังออกแบบแบบฝึกหัดหรือข้อสอบที่ปรับความยากง่ายให้เหมาะกับระดับความสามารถของผู้เรียนแต่ละคนโดยอัตโนมัติ ช่วยให้ครูมีเวลาดูแลนักเรียนเป็นรายบุคคลได้มากขึ้น</p>
+    </div>
+    <div class="card">
+      <h3>ด้านความบันเทิงและสื่อ</h3>
+      <img class="card-img" src="images/ความบันเทิงสื่อ.png" alt="AI ด้านความบันเทิงและสื่อ">
+      <p>AI วิเคราะห์พฤติกรรมการรับชมและการฟังของผู้ใช้ เพื่อแนะนำเพลง หนัง ซีรีส์ และคอนเทนต์ที่ตรงกับความชอบของแต่ละคนได้แม่นยำขึ้น นอกจากนี้ยังช่วยตัดต่อวิดีโอ สร้างภาพประกอบ เขียนบทหรือคำบรรยาย และสร้างเอฟเฟกต์พิเศษ ทำให้ผู้สร้างคอนเทนต์ทำงานได้เร็วขึ้นโดยไม่ต้องใช้ทีมงานขนาดใหญ่</p>
+    </div>
+    <div class="card">
+      <h3>ด้านธุรกิจ</h3>
+      <img class="card-img" src="images/ธุรกิจ.png" alt="AI ด้านธุรกิจ">
+      <p>AI ช่วยตอบคำถามและให้บริการลูกค้าแบบอัตโนมัติตลอด 24 ชั่วโมง วิเคราะห์ข้อมูลยอดขายและพฤติกรรมผู้บริโภคเพื่อคาดการณ์แนวโน้มตลาดล่วงหน้า รวมถึงช่วยเพิ่มประสิทธิภาพการบริหารสต็อกสินค้าและกระบวนการทำงานภายในองค์กร ทำให้ธุรกิจตัดสินใจได้แม่นยำและรวดเร็วขึ้น</p>
+    </div>
+  </section>
+
+  <section id="contact" class="page">
+    <h1>ติดต่อเรา</h1>
+    <p class="lede">มีคำถามหรือข้อเสนอแนะ ส่งข้อความถึงเราได้เลย</p>
+    <form onsubmit="event.preventDefault(); alert('ส่งข้อความเรียบร้อย ขอบคุณค่ะ/ครับ');">
+      <div>
+        <label for="name">ชื่อ</label><br>
+        <input id="name" type="text" required>
+      </div>
+      <div>
+        <label for="email">อีเมล</label><br>
+        <input id="email" type="email" required>
+      </div>
+      <div>
+        <label for="msg">ข้อความ</label><br>
+        <textarea id="msg" rows="4" required></textarea>
+      </div>
+      <button class="btn" type="submit" style="align-self:flex-start;">ส่งข้อความ</button>
+    </form>
+  </section>
+
+</main>
+
+<footer>© 2026 AI Applications — เว็บไซต์สาธิต</footer>
+
+<script>
+  function goTo(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelector('nav button[data-page="'+id+'"]').classList.add('active');
+    location.hash = id;
+  }
+  document.querySelectorAll('nav button').forEach(btn=>{
+    btn.addEventListener('click', ()=>goTo(btn.dataset.page));
+  });
+  window.addEventListener('hashchange', ()=>{
+    const id = location.hash.replace('#','') || 'home';
+    if(document.getElementById(id)) goTo(id);
+  });
+  const start = location.hash.replace('#','');
+  if(start && document.getElementById(start)) goTo(start);
+</script>
+
+</body>
+</html>
